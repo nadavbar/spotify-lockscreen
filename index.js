@@ -97,7 +97,7 @@ function setLockScreenIfTrackChanged(cb) {
         return cb();
       }
 
-      var imageUrl = $('img[id=big-cover]')[0].attribs.src;
+      var imageUrl = imageElement.attribs.src;
       // download the image and set the lockscreen
       download(imageUrl, imageLocation, function (err) {
         if (err) {

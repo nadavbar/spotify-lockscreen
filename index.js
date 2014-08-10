@@ -17,35 +17,35 @@ var spotify = new nodeSpotifyWebHelper.SpotifyWebHelper();
 var lockScreenImageDir = path.join(__dirname, 'lockscreen_img');
 
 if (!fs.existsSync(lockScreenImageDir)) {
-	fs.mkdirSync(lockScreenImageDir);
+  fs.mkdirSync(lockScreenImageDir);
 }
 
 var imageLocation = path.join(lockScreenImageDir, 'image.png');
 
 function download(uri, filename, callback) {
-	callback = callback || function () {};
-	var st = request(uri).pipe(fs.createWriteStream(filename));
-	st.on('close', callback);
-	st.on('error', callback);
+  callback = callback || function () {};
+  var st = request(uri).pipe(fs.createWriteStream(filename));
+  st.on('close', callback);
+  st.on('error', callback);
 };
 
 
 function setLockScreen(path, cb) {
-	cb = cb || function() {}
-	storage.StorageFile.getFileFromPathAsync(path, function(err, file) {
-		if (err) {
-			console.error('Error getting image file:', err);
-			cb(err);
-		}
+  cb = cb || function() {}
+  storage.StorageFile.getFileFromPathAsync(path, function(err, file) {
+    if (err) {
+      console.error('Error getting image file:', err);
+      cb(err);
+    }
 
-		profile.LockScreen.setImageFileAsync(file, function(err) {
-			if (err) {
-				console.error('Error setting lock screen image:', err);
-				return cb(err);
-			}
-			cb();
-		});
-	});
+    profile.LockScreen.setImageFileAsync(file, function(err) {
+      if (err) {
+        console.error('Error setting lock screen image:', err);
+        return cb(err);
+      }
+      cb();
+    });
+  });
 }
 
 
@@ -53,131 +53,131 @@ var currentArtistName;
 
 function setLockScreenIfTrackChanged(cb) {
 
-	var spotify = new nodeSpotifyWebHelper.SpotifyWebHelper();
+  var spotify = new nodeSpotifyWebHelper.SpotifyWebHelper();
 
-	cb = cb || function() {};
+  cb = cb || function() {};
 
 
-	spotify.getStatus(function (err, res) {
+  spotify.getStatus(function (err, res) {
 
-		if (err) {
-			console.info("Error, skipping");
-			return cb();
-		}
+    if (err) {
+      console.info("Error, skipping");
+      return cb();
+    }
 
-		if (!res || !res.track) {
+    if (!res || !res.track) {
 
-			if (currentArtistName != "none") {
-				console.info('No data, setting default');
-				currentArtistName = "none";
-				setLockScreen(defaultImage, function(err) {
-					return cb();
-				});
-			}
-		}
+      if (currentArtistName != "none") {
+        console.info('No data, setting default');
+        currentArtistName = "none";
+        setLockScreen(defaultImage, function(err) {
+          return cb();
+        });
+      }
+    }
 
-		else {
+    else {
 
-			if (res.playing) {
+      if (res.playing) {
 
-				if (currentArtistName === res.track.artist_resource.name) {
-					return cb(null, false);
-				}
+        if (currentArtistName === res.track.artist_resource.name) {
+          return cb(null, false);
+        }
 
-				currentArtistName = res.track.artist_resource.name;
-				
+        currentArtistName = res.track.artist_resource.name;
 
-				var url = "https://api.spotify.com/v1/artists/";
 
-				if (res.track.artist_resource.uri) {
-					var url = url + res.track.artist_resource.uri.split(':')[2];
-				}
+        var url = "https://api.spotify.com/v1/artists/";
 
-				request(url, function (err, res, body) {
+        if (res.track.artist_resource.uri) {
+          var url = url + res.track.artist_resource.uri.split(':')[2];
+        }
 
-					if (err) {
-						console.info('Error');
-						return cb();
-					}
+        request(url, function (err, res, body) {
 
-					if (!body) {
-						console.info('No image data, setting default');
+          if (err) {
+            console.info('Error');
+            return cb();
+          }
 
-						setLockScreen(spotifyImage, function(err) {
-							return cb();
-						});
+          if (!body) {
+            console.info('No image data, setting default');
 
-					}
-					
-					var obj = JSON.parse(body);
+            setLockScreen(spotifyImage, function(err) {
+              return cb();
+            });
 
-					if (!obj.images) {
+          }
 
-						console.info('No image data, setting default');
+          var obj = JSON.parse(body);
 
-						setLockScreen(spotifyImage, function(err) {
-							return cb();
-						});
-					}
+          if (!obj.images) {
 
-					else {
+            console.info('No image data, setting default');
 
-						try {
+            setLockScreen(spotifyImage, function(err) {
+              return cb();
+            });
+          }
 
-							var imageUrl = obj.images[0].url;
-							console.info('Setting lockscreen: ' + currentArtistName);
+          else {
 
-							download(imageUrl, imageLocation, function (err) {
-								
-								if (err) {
-									console.info('error, skipping');
-									return cb();
-								}
+            try {
 
-								setLockScreen(imageLocation, function(err) {
-									cb();
-								});
+              var imageUrl = obj.images[0].url;
+              console.info('Setting lockscreen: ' + currentArtistName);
 
-							});
+              download(imageUrl, imageLocation, function (err) {
 
-						}
+                if (err) {
+                  console.info('error, skipping');
+                  return cb();
+                }
 
-						catch (err) {
+                setLockScreen(imageLocation, function(err) {
+                  cb();
+                });
 
-							console.info('No image data, setting default');
+              });
 
-							setLockScreen(spotifyImage, function(err) {
-								return cb();
-							});
+            }
 
-						}
+            catch (err) {
 
-					}
+              console.info('No image data, setting default');
 
-				});
-			}
+              setLockScreen(spotifyImage, function(err) {
+                return cb();
+              });
 
-			else {
+            }
 
-				if (currentArtistName != "paused") {
+          }
 
-					console.info('Spotify is paused, setting default');
-					currentArtistName = "paused";
+        });
+      }
 
-					setLockScreen(pausedImage, function(err) {
-						return cb();
-					});
+      else {
 
-				}
+        if (currentArtistName != "paused") {
 
-			}
+          console.info('Spotify is paused, setting default');
+          currentArtistName = "paused";
 
-		}
+          setLockScreen(pausedImage, function(err) {
+            return cb();
+          });
 
-	});
+        }
+
+      }
+
+    }
+
+  });
 
 };
 
 setInterval(function () {
-	setLockScreenIfTrackChanged();
+  setLockScreenIfTrackChanged();
 }, 10000);

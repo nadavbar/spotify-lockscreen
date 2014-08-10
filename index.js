@@ -18,7 +18,7 @@ if (!fs.existsSync(lockScreenImageDir)) {
 }
 
 var imageLocation = path.join(lockScreenImageDir, 'image.png');
-var defaultImage = path.join(lockscrenImageDir, 'default.png');
+var defaultImage = path.join(lockScreenImageDir, 'default.png');
 var spotifyImage = path.join(lockScreenImageDir, 'spotify.png');
 var pausedImage = path.join(lockScreenImageDir, 'paused.png');
 

@@ -54,14 +54,7 @@ var currentArtistName;
 // 1. Get the currently playing track information using SpotifyWebHelper
 // 2. Check if track.artist_resource.name is different from the value in currentArtistName - if not return
 // 3. If it's a new artist:
-//    3.1 ??
-
-/* 2. Check if the track that we got is different from the value in currentTrackUri - if not - return
-   3. If it's a new track:
-      3.1 scrape the track's web page and get the url of the image assocaited with the track
-      3.2 download the image and save it to file
-      3.3 set the downaloded image as the lockscreen
-*/
+//    3.1
 function setLockScreenIfArtistChanged(cb) {
 
   var spotify = new nodeSpotifyWebHelper.SpotifyWebHelper();

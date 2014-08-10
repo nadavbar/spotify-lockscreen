@@ -12,6 +12,7 @@ var spotify = new nodeSpotifyWebHelper.SpotifyWebHelper();
 
 var lockScreenImageDir = path.join(__dirname, 'lockscreen_img');
 
+// make sure the directory in which we save the images exist
 if (!fs.existsSync(lockScreenImageDir)) {
   fs.mkdirSync(lockScreenImageDir);
 }
@@ -28,7 +29,7 @@ function download(uri, filename, callback) {
   st.on('error', callback);
 };
 
-
+// sets the windows lockscreen to the current image path, using NodeRT modules
 function setLockScreen(path, cb) {
   cb = cb || function() {}
   storage.StorageFile.getFileFromPathAsync(path, function(err, file) {
@@ -47,10 +48,21 @@ function setLockScreen(path, cb) {
   });
 }
 
-
+// holds the artistName of the track that is currently playing
 var currentArtistName;
 
-function setLockScreenIfTrackChanged(cb) {
+// 1. Get the currently playing track information using SpotifyWebHelper
+// 2. Check if track.artist_resource.name is different from the value in currentArtistName - if not return
+// 3. If it's a new artist:
+//    3.1 ??
+
+/* 2. Check if the track that we got is different from the value in currentTrackUri - if not - return
+   3. If it's a new track:
+      3.1 scrape the track's web page and get the url of the image assocaited with the track
+      3.2 download the image and save it to file
+      3.3 set the downaloded image as the lockscreen
+*/
+function setLockScreenIfArtistChanged(cb) {
 
   var spotify = new nodeSpotifyWebHelper.SpotifyWebHelper();
 
@@ -174,5 +186,5 @@ function setLockScreenIfTrackChanged(cb) {
 };
 
 setInterval(function () {
-  setLockScreenIfTrackChanged();
+  setLockScreenIfArtistChanged();
 }, 10000);

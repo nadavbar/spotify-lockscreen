@@ -1,7 +1,3 @@
-var defaultImage = "C:\\Users\\Steyn\\Documents\\spotify-lockscreen\\lockscreen_img\\default.png";
-var spotifyImage = "C:\\Users\\Steyn\\Documents\\spotify-lockscreen\\lockscreen_img\\spotify.png";
-var pausedImage = "C:\\Users\\Steyn\\Documents\\spotify-lockscreen\\lockscreen_img\\paused.png";
-
 var fs = require('fs');
 var path = require('path');
 
@@ -21,6 +17,9 @@ if (!fs.existsSync(lockScreenImageDir)) {
 }
 
 var imageLocation = path.join(lockScreenImageDir, 'image.png');
+var defaultImage = path.join(lockscrenImageDir, 'default.png');
+var spotifyImage = path.join(lockScreenImageDir, 'spotify.png');
+var pausedImage = path.join(lockScreenImageDir, 'paused.png');
 
 function download(uri, filename, callback) {
   callback = callback || function () {};
@@ -143,9 +142,7 @@ function setLockScreenIfTrackChanged(cb) {
             }
 
             catch (err) {
-
               console.info('No image data, setting default');
-
               setLockScreen(spotifyImage, function(err) {
                 return cb();
               });
@@ -158,9 +155,7 @@ function setLockScreenIfTrackChanged(cb) {
       }
 
       else {
-
         if (currentArtistName != "paused") {
-
           console.info('Spotify is paused, setting default');
           currentArtistName = "paused";
 
